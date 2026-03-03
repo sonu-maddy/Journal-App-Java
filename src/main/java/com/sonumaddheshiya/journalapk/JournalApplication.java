@@ -8,6 +8,7 @@ import org.springframework.data.mongodb.MongoTransactionManager;
 import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
+import org.springframework.web.bind.annotation.GetMapping;
 
 
 @EnableMongoRepositories(basePackages = "com.sonumaddheshiya.journalapk.repository")
@@ -20,9 +21,11 @@ public class JournalApplication {
 		SpringApplication.run(JournalApplication.class, args);
 	}
 
-//	@Bean
-//	public PlatformTransactionManager get(MongoDatabaseFactory dbFactory){
-//		return new MongoTransactionManager(dbFactory);
-//	}
+
+
+	@Bean
+	public PlatformTransactionManager get(MongoDatabaseFactory dbFactory){
+		return new MongoTransactionManager(dbFactory);
+	}
 
 }

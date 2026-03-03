@@ -3,41 +3,31 @@ package com.sonumaddheshiya.journalapk.service;
 import com.sonumaddheshiya.journalapk.entity.JournalEntry;
 import com.sonumaddheshiya.journalapk.entity.UsersDetails;
 import com.sonumaddheshiya.journalapk.repository.JournalEntryRepository;
-import com.sonumaddheshiya.journalapk.repository.UserRepository;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-@Slf4j
 @Service
 public class JournalEntryService {
 
-
-    // private static final Logger log = (Logger) LoggerFactory.getLogger(JournalEntryService.class);
-
     private final JournalEntryRepository journalEntryRepository;
-    private final UserRepository userRepository;
+    private final UserService userService;
 
-    @Autowired
-    UserService userService;
-    private Process log;
-
-    public JournalEntryService(JournalEntryRepository journalEntryRepository, UserRepository userRepository) {
+    // ✅ Constructor Injection Only
+    public JournalEntryService(JournalEntryRepository journalEntryRepository,
+                               UserService userService) {
         this.journalEntryRepository = journalEntryRepository;
-        this.userRepository = userRepository;
+        this.userService = userService;
     }
 
-
-    @Transactional
+    // ✅ Create Entry
     public JournalEntry saveEntry(JournalEntry journalEntry, String username) {
 
         UsersDetails user = userService.findByUserName(username);
+
         if (user == null) {
             throw new RuntimeException("User not found");
         }
@@ -53,54 +43,62 @@ public class JournalEntryService {
         }
 
         user.getJournalEntries().add(saved);
-        userRepository.save(user);
+
+        userService.saveUser(user);   // ✅ Correct layer usage
 
         return saved;
     }
 
-
-    public JournalEntry saveEntry(JournalEntry journalEntry) {
-
-        return journalEntryRepository.save(journalEntry);
-    }
-
-
-
+    // ✅ Get All
     public List<JournalEntry> getAllEntry() {
-
         return journalEntryRepository.findAll();
     }
 
-    public Optional<JournalEntry> getByIdEntry(String id){
-
+    // ✅ Get By ID
+    public Optional<JournalEntry> getByIdEntry(String id) {
         return journalEntryRepository.findById(id);
     }
 
-    public Optional<JournalEntry> deleteById(String id, String username) {
+    // ✅ Delete
+    public boolean deleteById(String id, String username) {
 
         Optional<JournalEntry> entryOpt = journalEntryRepository.findById(id);
 
         if (entryOpt.isEmpty()) {
-            return Optional.empty();
+            return false;
         }
 
         journalEntryRepository.deleteById(id);
 
-        return entryOpt;
-    }
+        UsersDetails user = userService.findByUserName(username);
 
-
-    public Optional<JournalEntry> updateById(String id, JournalEntry newEntry){
-        Optional<JournalEntry> existing = journalEntryRepository.findById(id);
-
-        if (existing.isPresent()) {
-            JournalEntry entry = existing.get();
-            entry.setTitle(newEntry.getTitle());
-            entry.setContent(newEntry.getContent());
-            entry.setDate(LocalDateTime.now());
-            journalEntryRepository.save(entry);
+        if (user != null && user.getJournalEntries() != null) {
+            user.getJournalEntries().removeIf(x -> x.getId().equals(id));
+            userService.saveUser(user);
         }
 
-        return existing;
+        return true;
+    }
+
+    // ✅ Update
+    public JournalEntry updateById(String id, JournalEntry newEntry, String username) {
+
+        Optional<JournalEntry> existing = journalEntryRepository.findById(id);
+
+        if (existing.isEmpty()) {
+            return null;
+        }
+
+        JournalEntry entry = existing.get();
+
+        if (newEntry.getTitle() != null)
+            entry.setTitle(newEntry.getTitle());
+
+        if (newEntry.getContent() != null)
+            entry.setContent(newEntry.getContent());
+
+        entry.setDate(LocalDateTime.now());
+
+        return journalEntryRepository.save(entry);
     }
 }

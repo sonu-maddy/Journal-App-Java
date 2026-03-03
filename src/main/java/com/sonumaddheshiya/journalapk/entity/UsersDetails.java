@@ -10,30 +10,33 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import java.util.ArrayList;
 import java.util.List;
 
-
-@Document(collection  = "users")
+@Document(collection = "users")
 public class UsersDetails {
 
     @Id
     private ObjectId id;
 
-    @NonNull
     @Indexed(unique = true)
+    @NonNull
     private String username;
 
     @NonNull
     private String password;
 
+    // ✅ ADD ROLES FIELD
+    private List<String> roles = new ArrayList<>();
+
     @DBRef
     private List<JournalEntry> journalEntries = new ArrayList<>();
 
+    // Getters & Setters
 
-    public String getPassword() {
-        return password;
+    public ObjectId getId() {
+        return id;
     }
 
-    public void setPassword(String password) {
-        this.password = password;
+    public void setId(ObjectId id) {
+        this.id = id;
     }
 
     public String getUsername() {
@@ -44,12 +47,12 @@ public class UsersDetails {
         this.username = username;
     }
 
-    public ObjectId getId() {
-        return id;
+    public String getPassword() {
+        return password;
     }
 
-    public void setId(ObjectId id) {
-        this.id = id;
+    public void setPassword(String password) {
+        this.password = password;
     }
 
     public List<JournalEntry> getJournalEntries() {
@@ -57,10 +60,15 @@ public class UsersDetails {
     }
 
     public void setJournalEntries(List<JournalEntry> journalEntries) {
-
         this.journalEntries = journalEntries;
     }
 
+    // ✅ Correct Roles Getter
+    public List<String> getRoles() {
+        return roles;
+    }
 
-
+    public void setRoles(List<String> roles) {
+        this.roles = roles;
+    }
 }

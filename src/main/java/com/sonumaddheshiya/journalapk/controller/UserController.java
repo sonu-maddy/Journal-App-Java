@@ -1,18 +1,13 @@
 package com.sonumaddheshiya.journalapk.controller;
 
-import com.sonumaddheshiya.journalapk.entity.JournalEntry;
 import com.sonumaddheshiya.journalapk.entity.UsersDetails;
-import com.sonumaddheshiya.journalapk.repository.UserRepository;
-import com.sonumaddheshiya.journalapk.service.JournalEntryService;
 import com.sonumaddheshiya.journalapk.service.UserService;
-import org.apache.catalina.User;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.DuplicateFormatFlagsException;
 import java.util.List;
 import java.util.Optional;
 
@@ -36,6 +31,7 @@ public class UserController {
 
     @GetMapping ("userId/{username}")
     public UsersDetails getUserById(@PathVariable String username){
+
         return userService.findByUserName(username);
     }
 
@@ -45,20 +41,13 @@ public class UserController {
         return userService.deleteById(id);
     }
 
-    @PostMapping("create-user")
-    public ResponseEntity<?> createUser(@RequestBody UsersDetails user) {
-        try {
-            return ResponseEntity.ok(userService.saveUser(user));
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
-        }
-    }
 
 
     @PutMapping("update-user")
     public ResponseEntity<?> updateUser(@RequestBody UsersDetails user){
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        String username = authentication.getName();
         UsersDetails usersDetails = userService.updateUser(user);
         return new ResponseEntity<>(usersDetails, HttpStatus.OK);
     }
