@@ -3,6 +3,9 @@ package com.sonumaddheshiya.journalapk.service;
 import com.sonumaddheshiya.journalapk.entity.UsersDetails;
 import com.sonumaddheshiya.journalapk.repository.UserRepository;
 import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -24,7 +27,9 @@ public class UserService {
         this.passwordEncoder = passwordEncoder;
     }
 
-    // ✅ ONLY FOR REGISTRATION
+
+   // Logger logger = LoggerFactory.getLogger(UserService.class);
+
     public UsersDetails registerUser(UsersDetails user) {
 
         if (user.getUsername() == null || user.getUsername().isBlank()) {
@@ -43,22 +48,38 @@ public class UserService {
         return userRepository.save(user);
     }
 
-    // ✅ FOR INTERNAL UPDATE (NO DUPLICATE CHECK)
+
     public UsersDetails saveUser(UsersDetails user) {
+
         return userRepository.save(user);
     }
 
-    public void saveNewUser(UsersDetails user) {
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
-        user.setRoles(Arrays.asList("USER"));
-        userRepository.save(user);
+    public boolean saveNewUser(UsersDetails user) {
+
+        try {
+            user.setPassword(passwordEncoder.encode(user.getPassword()));
+            user.setRoles(Arrays.asList("USER"));
+            userRepository.save(user);
+            return true;
+
+        } catch (Exception e) {
+              log.info("fgvbhjnhj error for {}", user.getUsername(),e);
+//            logger.error("fgvbhjnhj");
+//            logger.trace("fgvbhjnhj");
+//            logger.warn("fgvbhjnhj");
+
+            return false;
+        }
+
     }
 
     public List<UsersDetails> getAllUsers() {
+
         return userRepository.findAll();
     }
 
     public UsersDetails findByUserName(String username) {
+
         return userRepository.findByUsername(username);
     }
 
@@ -67,7 +88,7 @@ public class UserService {
         return null;
     }
 
-    // ✅ UPDATE PASSWORD OR DETAILS
+
     public UsersDetails updateUser(UsersDetails user) {
 
         UsersDetails existingUser =

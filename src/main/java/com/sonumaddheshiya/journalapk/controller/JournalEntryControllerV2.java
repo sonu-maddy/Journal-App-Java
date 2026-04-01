@@ -37,7 +37,7 @@ public class JournalEntryControllerV2 {
         this.journalEntryRepository = journalEntryRepository;
     }
 
-    // ✅ Get All Entries (Logged-in User Only)
+
     @GetMapping("/all")
     public ResponseEntity<?> getAllJournalEntryByUser() {
 
@@ -55,7 +55,6 @@ public class JournalEntryControllerV2 {
         return ResponseEntity.ok(user.getJournalEntries());
     }
 
-    // ✅ Create Entry
     @PostMapping("/create")
     public ResponseEntity<?> createEntry(
             @RequestBody JournalEntry myEntry) {
@@ -71,7 +70,7 @@ public class JournalEntryControllerV2 {
         return ResponseEntity.status(201).body(myEntry);
     }
 
-    // ✅ Get By ID (Only If Belongs To Logged-in User)
+
     @GetMapping("id/{myid}")
     public ResponseEntity<?> getJournalEntryById(
             @PathVariable String myid) {
@@ -96,7 +95,7 @@ public class JournalEntryControllerV2 {
         return  new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
-    // ✅ Delete Entry (Secure)
+
     @Transactional
     @DeleteMapping("delete/{id}")
     public boolean deleteById(String id, String username) {
@@ -128,7 +127,7 @@ public class JournalEntryControllerV2 {
         return true;
     }
 
-    // ✅ Update Entry (Secure)
+
     @PutMapping("update/{id}")
     public ResponseEntity<?> updateJournalById(
             @PathVariable String id,

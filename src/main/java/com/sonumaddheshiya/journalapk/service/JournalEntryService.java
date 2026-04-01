@@ -3,7 +3,10 @@ package com.sonumaddheshiya.journalapk.service;
 import com.sonumaddheshiya.journalapk.entity.JournalEntry;
 import com.sonumaddheshiya.journalapk.entity.UsersDetails;
 import com.sonumaddheshiya.journalapk.repository.JournalEntryRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -16,6 +19,8 @@ public class JournalEntryService {
     private final JournalEntryRepository journalEntryRepository;
     private final UserService userService;
 
+
+
     // ✅ Constructor Injection Only
     public JournalEntryService(JournalEntryRepository journalEntryRepository,
                                UserService userService) {
@@ -23,33 +28,41 @@ public class JournalEntryService {
         this.userService = userService;
     }
 
-    // ✅ Create Entry
+
+    @Transactional
     public JournalEntry saveEntry(JournalEntry journalEntry, String username) {
 
-        UsersDetails user = userService.findByUserName(username);
+        try {
+            UsersDetails user = userService.findByUserName(username);
 
-        if (user == null) {
-            throw new RuntimeException("User not found");
+            if (user == null) {
+                throw new RuntimeException("User not found");
+            }
+
+            if (journalEntry.getDate() == null) {
+                journalEntry.setDate(LocalDateTime.now());
+            }
+
+            JournalEntry saved = journalEntryRepository.save(journalEntry);
+
+            if (user.getJournalEntries() == null) {
+                user.setJournalEntries(new ArrayList<>());
+            }
+
+            user.getJournalEntries().add(saved);
+
+            userService.saveUser(user);
+
+            return saved;
+        } catch (Exception e) {
+
+            throw new RuntimeException(e);
         }
 
-        if (journalEntry.getDate() == null) {
-            journalEntry.setDate(LocalDateTime.now());
-        }
 
-        JournalEntry saved = journalEntryRepository.save(journalEntry);
-
-        if (user.getJournalEntries() == null) {
-            user.setJournalEntries(new ArrayList<>());
-        }
-
-        user.getJournalEntries().add(saved);
-
-        userService.saveUser(user);   // ✅ Correct layer usage
-
-        return saved;
     }
 
-    // ✅ Get All
+
     public List<JournalEntry> getAllEntry() {
         return journalEntryRepository.findAll();
     }

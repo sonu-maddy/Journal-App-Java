@@ -1,6 +1,6 @@
 package com.sonumaddheshiya.journalapk.entity;
 
-import lombok.NonNull;
+import lombok.*;
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
@@ -10,6 +10,10 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import java.util.ArrayList;
 import java.util.List;
 
+@Data
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 @Document(collection = "users")
 public class UsersDetails {
 
@@ -23,7 +27,7 @@ public class UsersDetails {
     @NonNull
     private String password;
 
-    // ✅ ADD ROLES FIELD
+
     private List<String> roles = new ArrayList<>();
 
     @DBRef
@@ -63,7 +67,7 @@ public class UsersDetails {
         this.journalEntries = journalEntries;
     }
 
-    // ✅ Correct Roles Getter
+
     public List<String> getRoles() {
         return roles;
     }

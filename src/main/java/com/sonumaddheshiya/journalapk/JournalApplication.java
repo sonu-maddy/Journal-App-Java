@@ -9,6 +9,7 @@ import org.springframework.data.mongodb.repository.config.EnableMongoRepositorie
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.client.RestTemplate;
 
 
 @EnableMongoRepositories(basePackages = "com.sonumaddheshiya.journalapk.repository")
@@ -19,6 +20,11 @@ public class JournalApplication {
 	public static void main(String[] args) {
 
 		SpringApplication.run(JournalApplication.class, args);
+	}
+
+	@Bean
+	public RestTemplate restTemplate(){
+		return new RestTemplate();
 	}
 
 
